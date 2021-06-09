@@ -8,7 +8,6 @@ The `mlda` enables the object categorization using MLDA.
 **Content:**
 *   [Requirements](#requirements)
 *   [Launch](#launch)
-*   [Files](#files)
 *   [References](#references)
 
 ## Requirement
