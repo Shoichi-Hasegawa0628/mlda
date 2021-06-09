@@ -1,9 +1,12 @@
+# -*- coding: utf-8 -*-
 import os
 import sys
+"""
 try:
     import cv2
 except ImportError:
     sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')#ROSが干渉してくる
+"""
 import cv2
 import numpy as np
 import glob
