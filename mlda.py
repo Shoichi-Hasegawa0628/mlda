@@ -12,10 +12,12 @@ __beta = 1.0
 epoch_num = 100 # 学習エポック
 
 def plot( n_dz, liks, D, K ):
-    print ("対数尤度", liks[-1])
+    print "対数尤度", liks[-1]
     doc_dopics = np.argmax( n_dz , 1 )
-    print ("分類結果", doc_dopics)
-    print ("---------------------")
+    # https://deepage.net/features/numpy-argmax.html
+    print "分類結果", doc_dopics
+    #print n_dz.shape
+    print "---------------------"
 
 
     # グラフ表示
@@ -23,6 +25,8 @@ def plot( n_dz, liks, D, K ):
     pylab.subplot("121")
     pylab.title( "P(z|d)" )
     pylab.imshow( n_dz / np.tile(np.sum(n_dz,1).reshape(D,1),(1,K)) , interpolation="none" )
+    #a = n_dz / np.tile(np.sum(n_dz,1).reshape(D,1),(1,K))
+    #print a
     pylab.subplot("122")
     pylab.title( "liklihood" )
     pylab.plot( range(len(liks)) , liks )
