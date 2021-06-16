@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import codecs
 import numpy as np
@@ -11,7 +12,7 @@ def make_bow( src_name, hist_name, dict_name ):
     src_nameファイルを開く
 
     """
-    for line in codecs.open( src_name, "r", "utf8" ).readlines():
+    for line in codecs.open( src_name, "r", "shift-jis" ).readlines():
         # 改行コードを削除
         line = line.rstrip("\r\n")
 
@@ -65,7 +66,7 @@ def make_bow( src_name, hist_name, dict_name ):
     print(hist)
 
 def main():
-    make_bow( "text.txt", "histogram_w.txt", "word_dic.txt" )
+    make_bow( "text.txt", "histgram_w.txt", "word_dic.txt" )
 
 if __name__ == '__main__':
     main()

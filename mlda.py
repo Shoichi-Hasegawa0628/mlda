@@ -205,8 +205,8 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
 def main():
     topic = 3
     data = []
-    data.append( np.loadtxt( "./bof/histogram_v.txt" , dtype=np.int32) )
-    data.append( np.loadtxt( "./bow/histogram_w.txt" , dtype=np.int32)*5 )
+    data.append( np.loadtxt( "./bof/histgram_v.txt" , dtype=np.int32) )
+    data.append( np.loadtxt( "./bow/histgram_w.txt" , dtype=np.int32)*5 )
     mlda( data, topic, 100, "learn_result" )
 
     data[1] = None

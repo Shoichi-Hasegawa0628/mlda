@@ -53,7 +53,7 @@ def make_bof( code_book_name, images, hist_name ):
 def main():
     files = glob.glob("images/*.png")
     make_codebook( files, 50, "codebook.txt" )
-    make_bof( "codebook.txt", files, "histogram_v.txt" )
+    make_bof( "codebook.txt", files, "histgram_v.txt" )
 
 if __name__ == '__main__':
     main()
