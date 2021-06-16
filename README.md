@@ -26,7 +26,9 @@ import cv2
 import glob
 import codecs
 ```
-
+```apt
+apt-get install python_tk
+```
 
 ## Launch
 1. Write sentences in `/MLDA/bow/text.txt`  
