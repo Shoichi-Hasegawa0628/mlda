@@ -55,12 +55,7 @@ def main():
 **※Sentences must be separated by spaces for each word.**
     - *For example*
     ```
-    内藤 は 彼女 が できない
-    内藤 は 理想 が 高すぎる
-    あの 店 の ラーメン は おいしい
-    おいしい 店 の ごはん を 食べる
-    室 は ずっと 踊って いる
-    室 は 顔芸 を して いる
+
     ```
 
 - `/MLDA/bof/bof.py`: It can generate **BoF file** which is used by `/MLDA/mlda.py` from `/MLDA/bof/images/*.png`
