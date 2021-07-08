@@ -11,7 +11,9 @@ import os
 # ハイパーパラメータ
 __alpha = 1.0
 __beta = 1.0
-epoch_num = 100 # 学習エポック
+epoch_num = 100
+
+ # 学習エポック
 
 def plot( n_dz, liks, D, K ):
     print ("対数尤度", liks[-1])
@@ -106,12 +108,12 @@ def save_model( save_dir, n_dz, n_mzw, n_mz, M, dims ):
 
     Pdz = n_dz + __alpha
     Pdz = (Pdz.T / Pdz.sum(1)).T
-    np.savetxt( os.path.join( save_dir, "Pdz.txt" ), Pdz, fmt=str("%f") )
+    np.savetxt( os.path.join( save_dir, "Pdz.txt" ), Pdz, fmt=str("%f") ) #これがθ_dkに相当する？
 
     for m in range(M):
         Pwz = (n_mzw[m].T + __beta) / (n_mz[m] + dims[m] *__beta)
         Pdw = Pdz.dot(Pwz.T)
-        np.savetxt( os.path.join( save_dir, "Pmdw[%d].txt" % m ) , Pdw )
+        np.savetxt( os.path.join( save_dir, "Pmdw[%d].txt" % m ) , Pdw ) #これがφでは？
 
     with open( os.path.join( save_dir, "model.pickle" ), "wb" ) as f:
         pickle.dump( [n_mzw, n_mz], f )
@@ -208,6 +210,10 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
         liks.append( lik )
         plot( n_dz, liks, D, K )
 
+    print("n_dz = ", n_dz)
+    print("n_mzw = ", n_mzw)
+    print("n_mz = ", n_mz)
+
     save_model( save_dir, n_dz, n_mzw, n_mz, M, dims )
 
     pylab.ioff()
@@ -219,13 +225,13 @@ def main():
 
     topic = 3
     data = []
-    data.append( np.loadtxt( "./bof/histogram_v.txt" , dtype=np.int32) )
-    data.append( np.loadtxt( "./bow/histogram_w.txt" , dtype=np.int32)*5 )
+    data.append( np.loadtxt( "./bof/histgram_v.txt" , dtype=np.int32) )
+    data.append( np.loadtxt( "./bow/histgram_w.txt" , dtype=np.int32)*5 )
     #print("data = ",data)
     mlda( data, topic, 100, "learn_result" )
 
-    data[1] = None
-    mlda( data, topic, 10, "recog_result" , "learn_result" )
+    #data[1] = None
+    #mlda( data, topic, 10, "recog_result" , "learn_result" )
 
 
 if __name__ == '__main__':

@@ -211,6 +211,7 @@ class MLDA(object):
         """
         Bag-of-words形式のデータを、データ形式に変換する
 
+
         Args:
             data(list[list[np.ndarray]]):       処理するデータ (Bag-of-Words形式)
             D(int):                             データ数
