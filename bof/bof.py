@@ -28,24 +28,34 @@ def make_codebook( images, code_book_size, save_name ):
     code_book = bow_trainer.cluster()
     np.savetxt( save_name, code_book )
 
+
 # ヒストグラム作成
 def make_bof( code_book_name, images, hist_name ):
-    code_book = np.loadtxt( code_book_name, dtype=np.float32 )
-
+    code_book = np.loadtxt( code_book_name, dtype=np.float32 ) # codebook.txtからnumpy.ndarray形式の浮動小数点32bitで読み込む
+    #print ("code_book = ", code_book, type(code_book))
     knn= cv2.ml.KNearest_create()
     knn.train(code_book, cv2.ml.ROW_SAMPLE, np.arange(len(code_book),dtype=np.float32))
 
-    hists = []
-    for img in images:
-        f = calc_feature( img )
-        idx = knn.findNearest( f, 1 )[1]
+    hists = [] # histgramの配列を作る
 
-        h = np.zeros( len(code_book) )
-        for i in idx:
+    counter = 0
+    h = np.zeros(len(code_book)) # 要素数が50で要素を0とする1次元配列の作成
+
+    for img in images:
+        f = calc_feature( img ) # 特徴量計算
+        idx = knn.findNearest( f, 1 )[1] # K=1で分類
+
+
+        for i in idx: # 頻度をカウントしている, idexの値自体が1〜50の値を取るから、それでヒットした回数をカウントしていく。
             h[int(i)] += 1
 
-        hists.append( h )
-        print(hists)
+        counter += 1
+
+        if counter == 8:
+               hists.append( h )
+               h = np.zeros(len(code_book))
+               counter =0
+               #print(hists)
 
     np.savetxt( hist_name, hists, fmt=str("%d")  )
 

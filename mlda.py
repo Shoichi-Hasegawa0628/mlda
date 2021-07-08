@@ -2,6 +2,8 @@
 import numpy as np
 import random
 import math
+
+from numpy.random import set_state
 import pylab
 import pickle
 import os
@@ -129,13 +131,19 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
     # 尤度のリスト
     liks = []
 
-    M = len(data)       # モダリティの数
+    M = len(data)       # モダリティの数, dataの要素数からモダリティを取得. 今回は2個
+    #print("モダリティM = ", M)
+    #print("モダリティM = ", type(M))
 
     dims = []
     for m in range(M):
-        if data[m] is not None:
-            dims.append( len(data[m][0]) )
-            D = len(data[m])    # 物体の数
+        if data[m] is not None: # 中身があるかを確認
+            dims.append( len(data[m][0]) ) # BoW, BoFの一行目のデータの要素数を取得して、特徴数を得る、今回は50
+            #print(data[m])
+            #print(data[m][0])
+            #print("dim = ", len(data[m][0]))
+            D = len(data[m])    # 物体の数 (データの行の数、今回は6)
+            #print("D = ", D)
         else:
             dims.append( 0 )
 
@@ -146,16 +154,23 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
          for m in range(M):
             if data[m] is not None:
                 docs_mdn[m][d] = conv_to_word_list( data[m][d] )
-                topics_mdn[m][d] = np.random.randint( 0, K, len(docs_mdn[m][d]) ) # 各単語にランダムでトピックを割り当てる
+                topics_mdn[m][d] = np.random.randint( 0, K, len(docs_mdn[m][d]) ) # 各単語ごとにランダムでトピックを割り当てる (最大3の値(0, 1, 2)で50個の単語に)
+                print("Topic =", topics_mdn[m][d])
 
-    # LDAのパラメータを計算
-    n_dz, n_mzw, n_mz = calc_lda_param( docs_mdn, topics_mdn, K, dims )
+
+    # LDAのパラメータを計算, ここから見てみる
+    """
+    n_dz        各物体dにおいてトピックzが発生した回数
+    n_mzw       各トピックzにおいて特徴wが発生した回数
+    n_mz        各トピックが発生した回数
+    """
+    n_dz, n_mzw, n_mz = calc_lda_param( docs_mdn, topics_mdn, K, dims ) #
 
     # 認識モードでは学習したパラメータを読み込む
     if load_dir:
         n_mzw, n_mz = load_model( load_dir )
 
-    for it in range(num_itr):
+    for it in range(num_itr): #ギブスサンプリング
         # メイン処理
         for d in range(D):
             for m in range(M):
@@ -199,10 +214,14 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
     pylab.show()
 
 def main():
+
+#Bow, BoF表現したdataを格納, data = [[wordのdata], [visualのデータ]]
+
     topic = 3
     data = []
     data.append( np.loadtxt( "./bof/histogram_v.txt" , dtype=np.int32) )
     data.append( np.loadtxt( "./bow/histogram_w.txt" , dtype=np.int32)*5 )
+    #print("data = ",data)
     mlda( data, topic, 100, "learn_result" )
 
     data[1] = None

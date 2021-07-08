@@ -27,7 +27,7 @@ import glob
 import codecs
 ```
 ```apt
-apt-get install python_tk
+apt-get install python-tk
 ```
 
 ## Launch
