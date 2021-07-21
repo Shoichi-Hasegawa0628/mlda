@@ -104,20 +104,12 @@ def calc_liklihood( data, n_dz, n_zw, n_z, K, V  ):
 def save_z(topics_mdn, M, D):
     # 単語ごとに割り当てられたトピックを保存
     np.savetxt("z.csv", topics_mdn, delimiter=",", fmt="%s")
-    #print("topics_mdn: ", type(topics_mdn))
+
     S = 3
     # トピックの頻度情報を保存
-    #frequency_topic = [[ None for i in range(D) ] for m in range(M)]
     frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
-    #frequency_topics = []
-    #print(frequency_topic)
-    #print(frequency_topic[0][0])
     f = open('z_frequency.csv', 'w')
     writer = csv.writer(f)
-    #for m in range(M):
-    #    for d in range(D):
-    #        frequency_topic[m][d] = np.random.randint( 0, 1, 3) 
-    #frequency_topic = np.zeros((2, 9, 3))
 
     for m in range(M):
         for d in range(D):
@@ -132,15 +124,8 @@ def save_z(topics_mdn, M, D):
                     frequency_topic[d][2] += 1
         
         writer.writerows(frequency_topic)
-        #frequency_topics.append(frequency_topic)
         frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
-    #print(frequency_topics)
-    #frequency_topic_csv = frequency_topic.tolist()
-    #print("topic: ", type(frequency_topic_csv))
-    #print(type(frequency_topic))
-    #np.savetxt("z_frequency.csv", frequency_topics, delimiter=",", fmt="%s")
     
-                    
 
 def save_model( save_dir, n_dz, n_mzw, n_mz, M, dims ):
     try:
