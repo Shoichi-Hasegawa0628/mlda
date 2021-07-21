@@ -2,6 +2,7 @@
 import numpy as np
 import random
 import math
+import csv
 
 from numpy.random import set_state
 import pylab
@@ -100,6 +101,47 @@ def calc_liklihood( data, n_dz, n_zw, n_z, K, V  ):
 
     return lik
 
+def save_z(topics_mdn, M, D):
+    # 単語ごとに割り当てられたトピックを保存
+    np.savetxt("z.csv", topics_mdn, delimiter=",", fmt="%s")
+    #print("topics_mdn: ", type(topics_mdn))
+    S = 3
+    # トピックの頻度情報を保存
+    #frequency_topic = [[ None for i in range(D) ] for m in range(M)]
+    frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
+    #frequency_topics = []
+    #print(frequency_topic)
+    #print(frequency_topic[0][0])
+    f = open('z_frequency.csv', 'w')
+    writer = csv.writer(f)
+    #for m in range(M):
+    #    for d in range(D):
+    #        frequency_topic[m][d] = np.random.randint( 0, 1, 3) 
+    #frequency_topic = np.zeros((2, 9, 3))
+
+    for m in range(M):
+        for d in range(D):
+            for n in range(len(topics_mdn[m][d])):
+                if topics_mdn[m][d][n] == 0:
+                    frequency_topic[d][0] += 1
+
+                elif topics_mdn[m][d][n] == 1:
+                    frequency_topic[d][1] += 1
+                
+                else:
+                    frequency_topic[d][2] += 1
+        
+        writer.writerows(frequency_topic)
+        #frequency_topics.append(frequency_topic)
+        frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
+    #print(frequency_topics)
+    #frequency_topic_csv = frequency_topic.tolist()
+    #print("topic: ", type(frequency_topic_csv))
+    #print(type(frequency_topic))
+    #np.savetxt("z_frequency.csv", frequency_topics, delimiter=",", fmt="%s")
+    
+                    
+
 def save_model( save_dir, n_dz, n_mzw, n_mz, M, dims ):
     try:
         os.mkdir( save_dir )
@@ -157,7 +199,7 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
             if data[m] is not None:
                 docs_mdn[m][d] = conv_to_word_list( data[m][d] )
                 topics_mdn[m][d] = np.random.randint( 0, K, len(docs_mdn[m][d]) ) # 各単語ごとにランダムでトピックを割り当てる (最大3の値(0, 1, 2)で50個の単語に)
-                print("Topic =", topics_mdn[m][d])
+                #print("Topic =", topics_mdn[m][d])
 
 
     # LDAのパラメータを計算, ここから見てみる
@@ -180,7 +222,9 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
                     continue
 
                 N = len(docs_mdn[m][d]) # 物体dのモダリティmに含まれる特徴数
+                #print("N: ", N)
                 for n in range(N):
+                    #print("M, D, N:",M, D, N)
                     w = docs_mdn[m][d][n]       # 特徴のインデックス
                     z = topics_mdn[m][d][n]     # 特徴に割り当てられているカテゴリ
 
@@ -197,6 +241,10 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
 
                     # データをサンプリングされたクラスに追加してパラメータを更新
                     topics_mdn[m][d][n] = z
+                    if d == D-1 and m == M-1 and n == N-1:
+                        save_z(topics_mdn, M, D) 
+                        #print("object_length: ", len(topics_mdn))
+
                     n_dz[d][z] += 1
 
                     if not load_dir:
