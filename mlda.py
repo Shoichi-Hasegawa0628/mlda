@@ -17,10 +17,10 @@ epoch_num = 100
  # 学習エポック
 
 def plot( n_dz, liks, D, K ):
-    print ("対数尤度", liks[-1])
+    #print ("対数尤度", liks[-1])
     doc_dopics = np.argmax( n_dz , 1 )
-    print ("分類結果", doc_dopics)
-    print ("---------------------")
+    #print ("分類結果", doc_dopics)
+    #print ("---------------------")
 
 
     # グラフ表示
@@ -101,8 +101,10 @@ def calc_liklihood( data, n_dz, n_zw, n_z, K, V  ):
 
     return lik
 
+
+"""
 def save_z(topics_mdn, M, D):
-    # 単語ごとに割り当てられたトピックを保存
+    # 単語ごとに割り当てられたトピックを保存 (物体の画像と単語に割り当てられたトピックを分けて保存)
     np.savetxt("z.csv", topics_mdn, delimiter=",", fmt="%s")
 
     S = 3
@@ -125,7 +127,44 @@ def save_z(topics_mdn, M, D):
         
         writer.writerows(frequency_topic)
         frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
-    
+"""
+
+def save_z(topics_mdn, M, D):
+    # 単語ごとに割り当てられたトピックを保存 (物体の画像と単語に割り当てられたトピックを一緒に保存)
+    np.savetxt("z.csv", topics_mdn, delimiter=",", fmt="%s")
+
+    S = 3
+    # トピックの頻度情報を保存
+    temporary_topic = [[ 0 for s in range(S) ] for d in range(D)]
+    frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
+
+    for m in range(M):
+        for d in range(D):
+            for n in range(len(topics_mdn[m][d])):
+                if topics_mdn[m][d][n] == 0:
+                    frequency_topic[d][0] += 1
+
+                elif topics_mdn[m][d][n] == 1:
+                    frequency_topic[d][1] += 1
+                
+                else:
+                    frequency_topic[d][2] += 1
+        
+        if M == 0:
+            #writer.writerows(frequency_topic)
+            temporary_topic = frequency_topic
+            frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
+        
+        # 画像と単語のトピック頻度数を合わせる
+        else:
+            for d in range(D):
+                for s in range(S):
+                    frequency_topic[d][s] += temporary_topic[d][s]
+                    print("保存されるデータ:", frequency_topic[d][s])
+                    
+            f = open('z_frequency.csv', 'w')
+            writer = csv.writer(f)
+            writer.writerows(frequency_topic)
 
 def save_model( save_dir, n_dz, n_mzw, n_mz, M, dims ):
     try:
@@ -243,9 +282,9 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
         liks.append( lik )
         plot( n_dz, liks, D, K )
 
-    print("n_dz = ", n_dz)
-    print("n_mzw = ", n_mzw)
-    print("n_mz = ", n_mz)
+    #print("n_dz = ", n_dz)
+    #print("n_mzw = ", n_mzw)
+    #print("n_mz = ", n_mz)
 
     save_model( save_dir, n_dz, n_mzw, n_mz, M, dims )
 
