@@ -127,7 +127,7 @@ def save_z(topics_mdn, M, D):
         
         writer.writerows(frequency_topic)
         frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
-"""
+
 
 def save_z(topics_mdn, M, D):
     # 単語ごとに割り当てられたトピックを保存 (物体の画像と単語に割り当てられたトピックを一緒に保存)
@@ -165,6 +165,7 @@ def save_z(topics_mdn, M, D):
             f = open('z_frequency.csv', 'w')
             writer = csv.writer(f)
             writer.writerows(frequency_topic)
+"""
 
 def save_model( save_dir, n_dz, n_mzw, n_mz, M, dims ):
     try:
@@ -265,8 +266,8 @@ def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
 
                     # データをサンプリングされたクラスに追加してパラメータを更新
                     topics_mdn[m][d][n] = z
-                    if d == D-1 and m == M-1 and n == N-1:
-                        save_z(topics_mdn, M, D) 
+                    #if d == D-1 and m == M-1 and n == N-1:
+                        #save_z(topics_mdn, M, D) 
                         #print("object_length: ", len(topics_mdn))
 
                     n_dz[d][z] += 1
