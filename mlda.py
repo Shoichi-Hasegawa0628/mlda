@@ -181,6 +181,7 @@ def save_model( save_dir, n_dz, n_mzw, n_mz, M, dims ):
         Pwz = (n_mzw[m].T + __beta) / (n_mz[m] + dims[m] *__beta)
         Pdw = Pdz.dot(Pwz.T)
         np.savetxt( os.path.join( save_dir, "Pmdw[%d].txt" % m ) , Pdw ) #これがφでは？
+        np.savetxt( os.path.join( save_dir, "Pdw[%d].txt" % m ) , Pwz ) 
 
     with open( os.path.join( save_dir, "model.pickle" ), "wb" ) as f:
         pickle.dump( [n_mzw, n_mz], f )
