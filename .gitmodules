@@ -1,0 +1,3 @@
+[submodule "data/mlda_dataset_original"]
+	path = data/mlda_dataset_original
+	url = https://github.com/Shoichi-Hasegawa0628/mlda_dataset_original.git

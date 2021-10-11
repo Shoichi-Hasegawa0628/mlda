@@ -1,20 +1,21 @@
+#! /usr/bin/env python
 # -*- coding: utf-8 -*-
-import numpy as np
+
+# Standard Library
 import random
+import os
 import math
 import csv
 
+# Third Party
+import numpy as np
 from numpy.random import set_state
 import pylab
 import pickle
-import os
 
-# ハイパーパラメータ
-__alpha = 1.0
-__beta = 1.0
-epoch_num = 100
+# Self-made Modules
+from __init__ import *
 
- # 学習エポック
 
 def plot( n_dz, liks, D, K ):
     #print ("対数尤度", liks[-1])
@@ -67,7 +68,7 @@ def sample_topic( d, w, n_dz, n_zw, n_z, K, V ):
     P = [ 0.0 ] * K
 
     # 累積確率を計算
-    P = (n_dz[d,:] + __alpha )*(n_zw[:,w] + __beta) / (n_z[:] + V *__beta)
+    P = (n_dz[d,:] + ALPHA)*(n_zw[:,w] + BETA) / (n_z[:] + V * BETA)
     for z in range(1,K):
         P[z] = P[z] + P[z-1]
 
@@ -92,9 +93,9 @@ def conv_to_word_list( data ):
 def calc_liklihood( data, n_dz, n_zw, n_z, K, V  ):
     lik = 0
 
-    P_wz = (n_zw.T + __beta) / (n_z + V *__beta)
+    P_wz = (n_zw.T + BETA) / (n_z + V * BETA)
     for d in range(len(data)):
-        Pz = (n_dz[d] + __alpha )/( np.sum(n_dz[d]) + K *__alpha )
+        Pz = (n_dz[d] + ALPHA)/( np.sum(n_dz[d]) + K * ALPHA)
         Pwz = Pz * P_wz
         Pw = np.sum( Pwz , 1 ) + 0.000001
         lik += np.sum( data[d] * np.log(Pw) )
@@ -102,83 +103,18 @@ def calc_liklihood( data, n_dz, n_zw, n_z, K, V  ):
     return lik
 
 
-"""
-def save_z(topics_mdn, M, D):
-    # 単語ごとに割り当てられたトピックを保存 (物体の画像と単語に割り当てられたトピックを分けて保存)
-    np.savetxt("z.csv", topics_mdn, delimiter=",", fmt="%s")
-
-    S = 3
-    # トピックの頻度情報を保存
-    frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
-    f = open('z_frequency.csv', 'w')
-    writer = csv.writer(f)
-
-    for m in range(M):
-        for d in range(D):
-            for n in range(len(topics_mdn[m][d])):
-                if topics_mdn[m][d][n] == 0:
-                    frequency_topic[d][0] += 1
-
-                elif topics_mdn[m][d][n] == 1:
-                    frequency_topic[d][1] += 1
-                
-                else:
-                    frequency_topic[d][2] += 1
-        
-        writer.writerows(frequency_topic)
-        frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
-
-
-def save_z(topics_mdn, M, D):
-    # 単語ごとに割り当てられたトピックを保存 (物体の画像と単語に割り当てられたトピックを一緒に保存)
-    np.savetxt("z.csv", topics_mdn, delimiter=",", fmt="%s")
-
-    S = 3
-    # トピックの頻度情報を保存
-    temporary_topic = [[ 0 for s in range(S) ] for d in range(D)]
-    frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
-
-    for m in range(M):
-        for d in range(D):
-            for n in range(len(topics_mdn[m][d])):
-                if topics_mdn[m][d][n] == 0:
-                    frequency_topic[d][0] += 1
-
-                elif topics_mdn[m][d][n] == 1:
-                    frequency_topic[d][1] += 1
-                
-                else:
-                    frequency_topic[d][2] += 1
-        
-        if M == 0:
-            #writer.writerows(frequency_topic)
-            temporary_topic = frequency_topic
-            frequency_topic = [[ 0 for s in range(S) ] for d in range(D)]
-        
-        # 画像と単語のトピック頻度数を合わせる
-        else:
-            for d in range(D):
-                for s in range(S):
-                    frequency_topic[d][s] += temporary_topic[d][s]
-                    print("保存されるデータ:", frequency_topic[d][s])
-                    
-            f = open('z_frequency.csv', 'w')
-            writer = csv.writer(f)
-            writer.writerows(frequency_topic)
-"""
-
 def save_model( save_dir, n_dz, n_mzw, n_mz, M, dims ):
     try:
         os.mkdir( save_dir )
     except:
         pass
 
-    Pdz = n_dz + __alpha
+    Pdz = n_dz + ALPHA
     Pdz = (Pdz.T / Pdz.sum(1)).T
     np.savetxt( os.path.join( save_dir, "Pdz.txt" ), Pdz, fmt=str("%f") ) #これがθ_dkに相当する？
 
     for m in range(M):
-        Pwz = (n_mzw[m].T + __beta) / (n_mz[m] + dims[m] *__beta)
+        Pwz = (n_mzw[m].T + BETA) / (n_mz[m] + dims[m] * BETA)
         Pdw = Pdz.dot(Pwz.T)
         np.savetxt( os.path.join( save_dir, "Pmdw[%d].txt" % m ) , Pdw ) #これがφでは？
         np.savetxt( os.path.join( save_dir, "Pdw[%d].txt" % m ) , Pwz ) 
@@ -195,7 +131,7 @@ def load_model( load_dir ):
     return a,b
 
 # MLDAのメイン処理
-def mlda( data, K, num_itr=epoch_num, save_dir="model", load_dir=None ):
+def mlda( data, K, num_itr = ITERATION, save_dir="model", load_dir=None ):
     pylab.ion()
 
     # 尤度のリスト
