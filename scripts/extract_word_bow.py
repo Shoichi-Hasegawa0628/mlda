@@ -41,7 +41,7 @@ class ExtractWordBow():
                     self.lines = []
                     ct += 1
 
-        elif status == "estimate":
+        else:
             pass
 
 
