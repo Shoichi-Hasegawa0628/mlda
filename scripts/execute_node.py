@@ -27,7 +27,7 @@ from __init__ import *
 class MLDA():
 
     def load_model( self, estimate_mode):
-        with open(DATA_FOLDER + "/model.pickle", "rb") as f:
+        with open(LEARN_RESULT_FOLDER + "/model.pickle", "rb") as f:
             a,b = pickle.load( f )
         return a,b
 
@@ -137,10 +137,10 @@ class MLDA():
 
 
     def plot(self, n_dz, liks, D):
-        #print("対数尤度：", liks[-1])
-        #doc_dopics = np.argmax(n_dz, 1)
-        #print("分類結果：", doc_dopics)
-        #print("---------------------")
+        print("対数尤度：", liks[-1])
+        doc_dopics = np.argmax(n_dz, 1)
+        print("分類結果：", doc_dopics)
+        print("---------------------")
         # グラフ表示
         pylab.clf()
         pylab.subplot("121")
@@ -154,7 +154,7 @@ class MLDA():
         pylab.pause(0.01)
 
 
-    def mlda_learn(self, count, save_dir="model", estimate_mode=False):
+    def mlda_learn(self, status, count, save_dir="model", estimate_mode=False):
         pylab.ion()
         liks = []
         Modality_num = len(self.data)
@@ -240,36 +240,41 @@ class MLDA():
                     lik += self.calc_liklihood(Target_modality, n_dz, n_mzw[Target_modality],
                                                n_mz[Target_modality], dimension_list[Target_modality])
             liks.append(lik)
-            # self.plot(n_dz, liks, Object_num)
+            self.plot(n_dz, liks, Object_num)
             if It == ITERATION - 1:
                 # if True:
                 print("Iteration ", It + 1)
 
-        self.save_model(save_dir, n_dz, n_mzw, n_mz, docs_mdn,
+        self.save_model(status, save_dir, n_dz, n_mzw, n_mz, docs_mdn,
                         topics_mdn, Modality_num, dimension_list, count)
 
 
     def mlda_server(self, status, observed_img_idx, count):
         if status == "learn":
-            self.data = [np.loadtxt(DATA_FOLDER + "/histogram_v.txt", dtype=np.int32),
-                         np.loadtxt(DATA_FOLDER + "/histogram_word.txt", dtype=np.int32) * 5]
-            rospy.loginfo("[Service em_mlda/learn] Defalut learning mode start")
-            self.mlda_learn(None, DATA_FOLDER + "/learn_result", False)
+            self.data = [np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
+                                    "bof" + "/" + status + "/" +
+                                    IMG_HIST, dtype=np.int32),
+                         np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
+                                    "bow" + "/" + status + "/" +
+                                    WORD_HIST, dtype=np.int32) * 5]
+            rospy.loginfo("Defalut learning mode start\n")
+            self.mlda_learn(status, None, LEARN_RESULT_FOLDER , False)
 
         else:
             self.data = [np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
                                     "bof/{}/{}".format(status, observed_img_idx) + "/" + "histgram_img_{}.txt".format(count),
                                     dtype=np.int32), None]
-            self.mlda_learn(count, PROCESSING_DATA_FOLDER + "/" +
+            self.mlda_learn(status, count, PROCESSING_DATA_FOLDER + "/" +
                             "esimate_result/{}".format(observed_img_idx), True)
 
 
     def __init__(self):
         self.data = []
+        self.mlda_server("learn", None, None)
 ######################################################################################################
 
 if __name__ == '__main__':
     sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
-    rospy.init_node('em_mlda_learn_server')
+    #rospy.init_node('em_mlda_learn_server')
     MLDA()
     # rospy.spin()

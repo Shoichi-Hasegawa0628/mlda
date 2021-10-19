@@ -23,22 +23,23 @@ class ExtractWordBow():
         rospy.loginfo("Ready em_mlda/word")
         self.lines = []
         self.dictionary = []
-        self.hist_w = np.zeros(3)
-
+        self.object_nums = 0
 
     def word_server(self, yolov3_image, status, observed_img_idx, count):
         if status == "learn":
-            ct = 1
             for c in range(len(OBJECT_CLASS)):
                 for n in range(len(OBJECT_NAME[c])):
                     self.separate_word(OBJECT_CLASS[c], OBJECT_NAME[c][n])
-                    self.make_dic()
-
-                    if c == 0 & n == 0:
-                        self.hist_w = np.zeros((len(self.lines), len(self.dictionary)))
-
-                    self.make_word_bow(ct)
-                    self.lines = []
+                    self.make_dic(status)
+                self.object_nums += len(OBJECT_NAME[c])
+            print(len(self.lines))
+            print(len(self.dictionary))
+            print(self.lines)
+            self.hist_w = np.zeros((self.object_nums, len(self.dictionary)))
+            ct = 0
+            for i in range(len(self.lines)):
+                self.make_word_bow(ct, status, self.lines[i])
+                if (i + 1) % (len(self.lines) / self.object_nums) == 0:
                     ct += 1
 
         else:
@@ -56,23 +57,27 @@ class ExtractWordBow():
         rospy.loginfo("Finished separating words\n")
 
 
-    def make_dic(self):
+    def make_dic(self, status):
         for line in self.lines:
             for word in line:
                 if word not in self.dictionary:
                     self.dictionary.append(word)
 
-        codecs.open(DATA_FOLDER + "/" + WORD_DICTIONARY, "w", "utf-8").write("\n".join(self.dictionary))
+        codecs.open(PROCESSING_DATA_FOLDER + "/" +
+                    "bow" + "/" + status + "/" +
+                    WORD_DICTIONARY, "w", "utf-8").write("\n".join(self.dictionary))
         rospy.loginfo("Saved the word dictionary as %s\n", WORD_DICTIONARY)
 
 
-    def make_word_bow(self, ct):
-        for words in enumerate(self.lines):
-            for word in words:
-                idx = self.dictionary.index(word)
-                self.hist_w[ct, idx] += 1
+    def make_word_bow(self, ct, status, lines):
+        for i, word in enumerate(lines):
+            #print(word)
+            idx = self.dictionary.index(word)
+            self.hist_w[ct, idx] += 1
 
-        np.savetxt(DATA_FOLDER + "/" + WORD_HIST, self.hist_w, fmt=str("%d"))
+        np.savetxt(PROCESSING_DATA_FOLDER + "/" +
+                   "bow" + "/" + status + "/" +
+                   WORD_HIST, self.hist_w, fmt=str("%d"))
         rospy.loginfo("Saved the word histgram as %s\n", WORD_HIST)
 
 
@@ -146,4 +151,6 @@ class ExtractWordBow():
 
 
 if __name__ == '__main__':
-    pass
+    extract_word_bow = ExtractWordBow()
+    status = "learn"
+    extract_word_bow.word_server(None, status, None, None)

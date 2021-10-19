@@ -48,6 +48,7 @@ class ExtractImgBof():
     def calc_feature(self, img):
         kp, discriptor = self.detector.detectAndCompute(img, None)
 
+        """
         if discriptor is None:
             print("特徴量抽出に失敗しました。\n")
             return 0, 0
@@ -55,6 +56,7 @@ class ExtractImgBof():
         elif len(discriptor) < 50:
             print("指定したcode_book_sizeよりも特徴数が少ないため失敗しました。\n")
             return 0, np.array(discriptor, dtype=np.float32)
+        """
 
         return 1, np.array(discriptor, dtype=np.float32)
 
@@ -67,14 +69,14 @@ class ExtractImgBof():
                                     object_name + "/" +
                                     "image/*.png")
             for img in image_files:
+                img = cv2.imread(img)
                 result, f = self.calc_feature(img)
                 bow_trainer.add(f)
 
             code_book = bow_trainer.cluster()
             np.savetxt(PROCESSING_DATA_FOLDER + "/" +
-                       "bof/{}".format(status) +
-                       "/codebook.txt",
-                       code_book)
+                       "bof/{}".format(status) + "/" +
+                       CODE_BOOK, code_book)
 
         else:
             result, f = self.calc_feature(self.cut_img)
@@ -103,8 +105,8 @@ class ExtractImgBof():
     def make_img_bof(self, status, object_class, object_name, count, observed_img_idx):
         if status == "learn":
             code_book = np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
-                                   "bof/{}".format(status) +
-                                   "/codebook.txt", dtype=np.float32 )
+                                   "bof/{}".format(status) + "/" +
+                                   CODE_BOOK, dtype=np.float32 )
             knn= cv2.ml.KNearest_create()
             knn.train(code_book, cv2.ml.ROW_SAMPLE, np.arange(len(code_book), dtype=np.float32))
             h = np.zeros(len(code_book)) # 要素数が50で要素を0とする1次元配列の作成
@@ -114,7 +116,8 @@ class ExtractImgBof():
                                     "image/*.png")
 
             for img in image_files:
-                f = self.calc_feature(img) # 特徴量計算
+                img = cv2.imread(img)
+                result, f = self.calc_feature(img) # 特徴量計算
                 idx = knn.findNearest(f, 1)[1] # K=1で分類
 
                 for i in idx: # 頻度をカウントしている, idexの値自体が1〜50の値を取るから、それでヒットした回数をカウントしていく。
@@ -122,9 +125,8 @@ class ExtractImgBof():
 
             self.hists.append(h)
             np.savetxt(PROCESSING_DATA_FOLDER + "/" +
-                       "bof/{}".format(status) +
-                       "/histgram_img.txt",
-                       self.hists, fmt = str("%d"))
+                       "bof/{}".format(status) + "/" +
+                       IMG_HIST, self.hists, fmt = str("%d"))
 
         else:
             result, f = self.calc_feature(self.cut_img)
@@ -179,4 +181,6 @@ class ExtractImgBof():
 
 
 if __name__ == '__main__':
-    pass
+    extract_img_bof = ExtractImgBof()
+    status = "learn"
+    extract_img_bof.img_server(status, None, None, None)
