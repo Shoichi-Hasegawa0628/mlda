@@ -25,6 +25,7 @@ class ExtractWordBow():
         self.dictionary = []
         self.object_nums = 0
 
+
     def word_server(self, yolov3_image, status, observed_img_idx, count):
         if status == "learn":
             for c in range(len(OBJECT_CLASS)):
@@ -43,7 +44,8 @@ class ExtractWordBow():
                     ct += 1
 
         else:
-            pass
+            result = self.estimate(yolov3_image, status, observed_img_idx, count)
+            return result
 
 
     def separate_word(self, object_class, object_name):
@@ -98,9 +100,8 @@ class ExtractWordBow():
 
 
     def estimate(self, yolov3_image, status, observed_img_idx, count):
-        word = np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
-                          "bow/{}/{}/Pmdw[1]_{}.txt".format(status, observed_img_idx, count))
-        word_file = open(DATA_FOLDER + "/" + WORD_DICTIONARY)
+        word = np.loadtxt(ESTIMATE_RESULT_FOLDER + "/{}/Pmdw[1]_{}.txt".format(observed_img_idx, count))
+        word_file = open(PROCESSING_DATA_FOLDER + "/bow/learn/" + WORD_DICTIONARY)
         word_dic = word_file.readlines()
         word_dic = [convert.replace("\n", "") for convert in word_dic]
         word_dic = [convert.replace(".", "") for convert in word_dic]
@@ -117,8 +118,7 @@ class ExtractWordBow():
         index_counter = 0
         estimated_words = "I estimated this object. "
         estimate_result = {}
-        with open(PROCESSING_DATA_FOLDER + "/" +
-                  "bow/{}/{}/estimate_word_{}.txt".format(status, observed_img_idx, count), mode='w') as f:
+        with open(ESTIMATE_RESULT_FOLDER + "/{}/estimate_word_{}.txt".format(observed_img_idx, count), mode='w') as f:
 
             for word_index in max_k_indices:
                 # print(word_dic[word_index])
@@ -136,21 +136,22 @@ class ExtractWordBow():
         for word_index in max_k_indices:
             estimate_hist[word_index] += 1
 
-        if os.path.exists(PROCESSING_DATA_FOLDER + "/" + "bow/{}/{}".format(status, observed_img_idx)) is True:
+        if os.path.exists(ESTIMATE_RESULT_FOLDER + "/{}".format(observed_img_idx)) is True:
             pass
         else:
-            os.mkdir(PROCESSING_DATA_FOLDER + "/" + "bow/{}/{}".format(status, observed_img_idx))
+            os.mkdir(ESTIMATE_RESULT_FOLDER + "/{}".format(observed_img_idx))
 
-        file = pathlib.Path(PROCESSING_DATA_FOLDER + "/" +
-                            "bow/{}/{}/estimate_histgram_word_{}.txt".format(status, observed_img_idx, count))
+        file = pathlib.Path(ESTIMATE_RESULT_FOLDER + "/{}/estimate_histgram_word_{}.txt".format(observed_img_idx, count))
         file.touch()
-        np.savetxt(PROCESSING_DATA_FOLDER + "/" +
-                   "bow/{}/{}/estimate_histgram_word_{}.txt".format(status, observed_img_idx, count),
-                   estimate_hist.reshape(1, -1), fmt=str("%d"))
-        return estimate_result
+        np.savetxt(ESTIMATE_RESULT_FOLDER + "/{}/estimate_histgram_word_{}.txt".format(observed_img_idx, count),
+                   estimate_hist.reshape(1, -1),
+                   fmt=str("%d"))
 
+        return estimate_result
 
 if __name__ == '__main__':
     extract_word_bow = ExtractWordBow()
-    status = "learn"
-    extract_word_bow.word_server(None, status, None, None)
+
+    #単独で実行させたいとき
+    #status = "learn"
+    #extract_word_bow.word_server(None, status, None, None)

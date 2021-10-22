@@ -26,6 +26,7 @@ ALPHA = 1.0
 BETA = 1.0
 
 LEARN_RESULT_FOLDER = "../data/learn_result"
+ESTIMATE_RESULT_FOLDER = "../data/estimate_result"
 PROCESSING_DATA_FOLDER = "../data/processing_data"
 LEARNING_DATASET_FOLDER = str(roslib.packages.get_pkg_dir("mlda_dataset_original")) + "/rsj_exp"
 OBJECT_CLASS = os.listdir(LEARNING_DATASET_FOLDER)

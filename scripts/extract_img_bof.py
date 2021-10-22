@@ -37,7 +37,6 @@ class ExtractImgBof():
                     ct += 1
 
         else:
-            ### データをロードするコマンド (judge_targetで保存した画像を読み込む？)###
             self.cut_img = self.image_callback(yolov3_image)
             result = self.make_codebook(None, None, status, count, observed_img_idx)
             if result == 0:
@@ -182,5 +181,7 @@ class ExtractImgBof():
 
 if __name__ == '__main__':
     extract_img_bof = ExtractImgBof()
-    status = "learn"
-    extract_img_bof.img_server(status, None, None, None)
+
+    #単独で実行させたいとき
+    #status = "learn"
+    #extract_img_bof.img_server(status, None, None, None)

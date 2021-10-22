@@ -264,8 +264,8 @@ class MLDA():
             self.data = [np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
                                     "bof/{}/{}".format(status, observed_img_idx) + "/" + "histgram_img_{}.txt".format(count),
                                     dtype=np.int32), None]
-            self.mlda_learn(status, count, PROCESSING_DATA_FOLDER + "/" +
-                            "esimate_result/{}".format(observed_img_idx), True)
+            self.mlda_learn(status, count, ESTIMATE_RESULT_FOLDER + "/" +
+                            "{}".format(observed_img_idx), True)
 
 
     def __init__(self):
