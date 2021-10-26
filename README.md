@@ -13,18 +13,18 @@ Original MLDA code is here： [https://github.com/naka-tomo/MLDA-PY](https://git
 *   [References](#references)
 
 ## Requirement
-- Ubuntu：18.04LTS, 20.04LTS
-- ROS：Melodic, Noetic
-- Python：2.7.17, 3.8.10
+- Ubuntu：18.04LTS (or 20.04LTS)
+- ROS：Melodic (or Noetic)
+- Python：2.7.17 (or 3.8.10)
 
 ```
-roslib：1.14.9
-rospy：1.14.11
-cv-bridge：1.13.0
+roslib：1.14.9 (or 1.15.7)
+rospy：1.14.11 (or 1.15.11)
+cv-bridge：1.13.0 (or 1.15.0)
 pathlib：1.0.1
 future：0.18.2
 futures：3.2.0
-numpy：1.16.6
+numpy：1.16.6 (or 1.19.5)
 ```
 
 ```
