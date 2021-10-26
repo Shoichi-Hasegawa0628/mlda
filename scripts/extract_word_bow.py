@@ -153,5 +153,5 @@ if __name__ == '__main__':
     extract_word_bow = ExtractWordBow()
 
     #単独で実行させたいとき
-    #status = "learn"
-    #extract_word_bow.word_server(None, status, None, None)
+    status = "learn"
+    extract_word_bow.word_server(None, status, None, None)

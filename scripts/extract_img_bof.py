@@ -183,5 +183,5 @@ if __name__ == '__main__':
     extract_img_bof = ExtractImgBof()
 
     #単独で実行させたいとき
-    #status = "learn"
-    #extract_img_bof.img_server(status, None, None, None)
+    status = "learn"
+    extract_img_bof.img_server(status, None, None, None)
