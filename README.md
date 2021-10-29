@@ -34,7 +34,7 @@ apt-get install python-tk
 ## Execution
 1. Initialize data folder: `bash reset-mlda-output.bash`  
 2. Create BoW:`python extract_word_bow.py`  
-3. Create BoW:`python extract_img_bof.py`  
+3. Create BoF:`python extract_img_bof.py`  
 4. Execute MLDA:`python execute_node.py`  
 
 If you want to change the dataset that trains the object, improve [mlda_dataset_original](https://github.com/Shoichi-Hasegawa0628/mlda_dataset_original/tree/rsj_experiment2) in data folder.
