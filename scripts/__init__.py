@@ -13,9 +13,9 @@ import math
 #from mlda_ros.srv import *
 #from mlda_ros.msg import *
 
-import sys
-reload(sys)
-sys.setdefaultencoding('utf-8')
+#import sys
+#reload(sys)
+#sys.setdefaultencoding('utf-8')
 import roslib.packages
 import os
 

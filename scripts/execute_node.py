@@ -21,8 +21,6 @@ import rospy
 from __init__ import *
 
 
-# セーブファイルはbashファイルで自動で生成してくれるようにしておく
-#
 
 class MLDA():
 
@@ -247,6 +245,8 @@ class MLDA():
 
         self.save_model(status, save_dir, n_dz, n_mzw, n_mz, docs_mdn,
                         topics_mdn, Modality_num, dimension_list, count)
+        pylab.ioff()
+        pylab.show()
 
 
     def mlda_server(self, status, observed_img_idx, count):
@@ -274,7 +274,7 @@ class MLDA():
 ######################################################################################################
 
 if __name__ == '__main__':
-    sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
+    #sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
     #rospy.init_node('em_mlda_learn_server')
     MLDA()
     # rospy.spin()
