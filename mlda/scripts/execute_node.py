@@ -274,7 +274,7 @@ class MLDA():
 ######################################################################################################
 
 if __name__ == '__main__':
-    #sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
+    sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
     #rospy.init_node('em_mlda_learn_server')
     MLDA()
     # rospy.spin()
