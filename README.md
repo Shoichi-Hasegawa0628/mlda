@@ -4,32 +4,41 @@ The `mlda` enables the object categorization using MLDA (Multimodal Latent Diric
 Also, this package can work with ROS systems.  
 Original MLDA code is here： [https://github.com/naka-tomo/MLDA-PY](https://github.com/naka-tomo/MLDA-PY)
 
+![result_mlda](https://user-images.githubusercontent.com/74911522/140467824-07dfc742-df3b-48e4-adea-1d8f59b4fc48.png)
+
 *   Maintainer: Shoichi Hasegawa ([hasegawa.shoichi@em.ci.ritsumei.ac.jp](mailto:hasegawa.shoichi@em.ci.ritsumei.ac.jp)).
 *   Author: Shoichi Hasegawa ([hasegawa.shoichi@em.ci.ritsumei.ac.jp](mailto:hasegawa.shoichi@em.ci.ritsumei.ac.jp)).
 
 **Content:**
-*   [Requirements](#requirements)
-*   [Execution](#execution)
-*   [References](#references)
+* [Requirements](#requirements)
+* [Folder](#folder)
+* [Execution](#execution)
+* [References](#references)
 
 ## Requirement
-- Ubuntu：18.04LTS (or 20.04LTS)
-- ROS：Melodic (or Noetic)
-- Python：2.7.17 (or 3.8.10)
+- Ubuntu：20.04LTS
+- ROS：Noetic
+- Python：3.8.10
 
 ```
-roslib：1.14.9 (or 1.15.7)
-rospy：1.14.11 (or 1.15.11)
-cv-bridge：1.13.0 (or 1.15.0)
+roslib：1.15.7
+rospy：1.15.11
+cv-bridge：1.15.0
 pathlib：1.0.1
 future：0.18.2
 futures：3.2.0
-numpy：1.16.6 (or 1.19.5)
+numpy：1.19.5
 ```
 
 ```
 apt-get install python-tk
 ```
+
+## Folder
+- `mlda`： Multimodal LDA folder, which has Feature extraction code, execution MLDA code.
+- `mlda_dataset_original`：Dataset of objects and images to learn.
+- `README.md`： This file.
+
 
 ## Execution
 1. Initialize data folder: `bash reset-mlda-output.bash`  
