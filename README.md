@@ -4,6 +4,8 @@ The `mlda` enables the object categorization using MLDA (Multimodal Latent Diric
 Also, this package can work with ROS systems.  
 Original MLDA code is here： [https://github.com/naka-tomo/MLDA-PY](https://github.com/naka-tomo/MLDA-PY)
 
+![result_mlda](https://user-images.githubusercontent.com/74911522/140467824-07dfc742-df3b-48e4-adea-1d8f59b4fc48.png)
+
 *   Maintainer: Shoichi Hasegawa ([hasegawa.shoichi@em.ci.ritsumei.ac.jp](mailto:hasegawa.shoichi@em.ci.ritsumei.ac.jp)).
 *   Author: Shoichi Hasegawa ([hasegawa.shoichi@em.ci.ritsumei.ac.jp](mailto:hasegawa.shoichi@em.ci.ritsumei.ac.jp)).
 
