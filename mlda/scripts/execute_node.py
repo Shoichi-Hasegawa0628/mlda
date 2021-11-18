@@ -57,6 +57,41 @@ class MLDA():
                 pickle.dump([n_dz, n_mzw, n_mz, docs_mdn, topics_mdn], f)
 
 
+    def save_frequency_z(self, topics_mdn, Modality_num, Object_num):
+        # 単語ごとに割り当てられた物体カテゴリを保存 (物体の画像と単語に割り当てられた物体カテゴリを一緒に保存)
+        np.savetxt("co_word.csv", topics_mdn, delimiter=",", fmt="%s")
+
+        # 物体ごとの物体カテゴリの割当回数を保存
+        temporary_topic = [[0 for s in range(CATEGORYNUM)] for d in range(Object_num)]
+        frequency_topic = [[0 for s in range(CATEGORYNUM)] for d in range(Object_num)]
+        for m in range(Modality_num):
+            for d in range(Object_num):
+                for n in range(len(topics_mdn[m][d])):
+                    if topics_mdn[m][d][n] == 0:
+                        frequency_topic[d][0] += 1
+                    elif topics_mdn[m][d][n] == 1:
+                        frequency_topic[d][1] += 1
+
+                    else:
+                        frequency_topic[d][2] += 1
+
+            if Modality_num == 0:
+                # writer.writerows(frequency_topic)
+                temporary_topic = frequency_topic
+                frequency_topic = [[0 for s in range(CATEGORYNUM)] for d in range(Object_num)]
+
+            # 画像と単語の物体カテゴリ割当て回数を合わせる
+            else:
+                for d in range(Object_num):
+                    for s in range(CATEGORYNUM):
+                        frequency_topic[d][s] += temporary_topic[d][s]
+                        # print("保存されるデータ:", frequency_topic[d][s])
+
+                f = open('co_frequency.csv', 'w')
+                writer = csv.writer(f)
+                writer.writerows(frequency_topic)
+
+
     def calc_liklihood(self, target_modality_num, n_dz, n_zw, n_z, V):
         lik = 0
         P_wz = (n_zw.T + BETA) / (n_z + V * BETA)
@@ -226,6 +261,10 @@ class MLDA():
 
                         # データをサンプリングされたクラスに追加してパラメータを更新
                         topics_mdn[Target_modality][Target_object][Target_character] = Target_character_category
+                        if Target_object == Object_num - 1 and Target_modality == Modality_num - 1 and Target_character == Target_character_num - 1:
+                            self.save_frequency_z(topics_mdn, Modality_num, Object_num)
+                        # print("object_length: ", len(topics_mdn)
+
                         n_dz[Target_object][Target_character_category] += 1
 
                         if not estimate_mode:
