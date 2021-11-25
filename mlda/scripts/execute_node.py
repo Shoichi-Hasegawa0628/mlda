@@ -16,19 +16,18 @@ from numpy.random import set_state
 import pylab
 import pickle
 import rospy
+import roslib.packages
 
 # Self-made Modules
 from __init__ import *
 
 
-
 class MLDA():
 
-    def load_model( self, estimate_mode):
+    def load_model(self, estimate_mode):
         with open(LEARN_RESULT_FOLDER + "/model.pickle", "rb") as f:
-            a,b = pickle.load( f )
-        return a,b
-
+            a, b = pickle.load(f)
+        return a, b
 
     def save_model(self, status, save_dir, n_dz, n_mzw, n_mz, docs_mdn, topics_mdn, M, dims, count):
         Pdz = n_dz + ALPHA
@@ -56,15 +55,16 @@ class MLDA():
             with open(os.path.join(save_dir, "model_{}.pickle".format(count)), "wb") as f:
                 pickle.dump([n_dz, n_mzw, n_mz, docs_mdn, topics_mdn], f)
 
-
     def save_frequency_z(self, topics_mdn, Modality_num, Object_num):
         # 単語ごとに割り当てられた物体カテゴリを保存 (物体の画像と単語に割り当てられた物体カテゴリを一緒に保存)
-        np.savetxt("co_word.csv", topics_mdn, delimiter=",", fmt="%s")
+        np.savetxt(str(roslib.packages.get_pkg_dir("spco2_mlda")) + "/data/pre_learning/co_frequency/co_word.csv", topics_mdn, delimiter=",", fmt="%s")
 
         # 物体ごとの物体カテゴリの割当回数を保存
         temporary_topic = [[0 for s in range(CATEGORYNUM)] for d in range(Object_num)]
         frequency_topic = [[0 for s in range(CATEGORYNUM)] for d in range(Object_num)]
         for m in range(Modality_num):
+            if m == 1:
+                continue
             for d in range(Object_num):
                 for n in range(len(topics_mdn[m][d])):
                     if topics_mdn[m][d][n] == 0:
@@ -87,10 +87,9 @@ class MLDA():
                         frequency_topic[d][s] += temporary_topic[d][s]
                         # print("保存されるデータ:", frequency_topic[d][s])
 
-                f = open('co_frequency.csv', 'w')
+                f = open(str(roslib.packages.get_pkg_dir("spco2_mlda")) + "/data/pre_learning/co_frequency/co_frequency.csv", 'w')
                 writer = csv.writer(f)
                 writer.writerows(frequency_topic)
-
 
     def calc_liklihood(self, target_modality_num, n_dz, n_zw, n_z, V):
         lik = 0
@@ -109,7 +108,6 @@ class MLDA():
 
         return lik
 
-
     def conv_to_word_list(self, data):
         if data.ndim == 1:
             V = data.shape[0]
@@ -123,13 +121,12 @@ class MLDA():
                 doc.append(v)
         return doc
 
-
     def sample_topic(self, target_object, Target_character_index, n_dz, n_zw, n_z, dimension_list):
         P = [0.0] * CATEGORYNUM
 
         # 累積確率を計算
         P = (n_dz[target_object, :] + ALPHA) * (n_zw[:,
-                                                     Target_character_index] + BETA) / (n_z[:] + dimension_list * BETA)
+                                                Target_character_index] + BETA) / (n_z[:] + dimension_list * BETA)
         for z in range(1, CATEGORYNUM):
             P[z] = P[z] + P[z - 1]
 
@@ -138,7 +135,6 @@ class MLDA():
         for z in range(CATEGORYNUM):
             if P[z] >= rnd:
                 return z
-
 
     def calc_lda_param(self, docs_mdn, topics_mdn, dims):
         Modality_num = len(docs_mdn)
@@ -168,7 +164,6 @@ class MLDA():
 
         return n_dz, n_mzw, n_mz
 
-
     def plot(self, n_dz, liks, D):
         print("対数尤度：", liks[-1])
         doc_dopics = np.argmax(n_dz, 1)
@@ -186,8 +181,7 @@ class MLDA():
         pylab.draw()
         pylab.pause(0.01)
 
-
-    def mlda_learn(self, status, count, save_dir="model", estimate_mode=False):
+    def mlda_learn(self, status, count, mode, save_dir="model", estimate_mode=False):
         pylab.ion()
         liks = []
         Modality_num = len(self.data)
@@ -233,7 +227,8 @@ class MLDA():
         # 推定モードでは学習済みのパラメータを読み込む
         if estimate_mode:
             n_mzw, n_mz = self.load_model(True)
-
+        print("D: {}".format(Object_num), "M: {}".format(Modality_num))
+        print(self.data)
         for It in range(ITERATION):
             # メインの処理
             for Target_object in range(Object_num):
@@ -242,6 +237,7 @@ class MLDA():
                         continue
 
                     Target_character_num = len(docs_mdn[Target_modality][Target_object])  # 物体dのモダリティmに含まれる特徴数
+                    print(Target_character_num)
                     for Target_character in range(Target_character_num):
                         # 特徴のインデックス
                         Target_character_index = docs_mdn[Target_modality][Target_object][Target_character]
@@ -261,9 +257,11 @@ class MLDA():
 
                         # データをサンプリングされたクラスに追加してパラメータを更新
                         topics_mdn[Target_modality][Target_object][Target_character] = Target_character_category
-                        if Target_object == Object_num - 1 and Target_modality == Modality_num - 1 and Target_character == Target_character_num - 1:
-                            self.save_frequency_z(topics_mdn, Modality_num, Object_num)
-                        # print("object_length: ", len(topics_mdn)
+                        if mode == "0":
+                            if Target_modality == 0 and Target_character == Target_character_num - 1:
+                                print("Save!")
+                                self.save_frequency_z(topics_mdn, Modality_num, Object_num)
+                            # print("object_length: ", len(topics_mdn)
 
                         n_dz[Target_object][Target_character_category] += 1
 
@@ -281,14 +279,15 @@ class MLDA():
             if It == ITERATION - 1:
                 # if True:
                 print("Iteration ", It + 1)
-
+                pylab.close()
+        if mode == "0":
+            return
         self.save_model(status, save_dir, n_dz, n_mzw, n_mz, docs_mdn,
                         topics_mdn, Modality_num, dimension_list, count)
         pylab.ioff()
         pylab.show()
 
-
-    def mlda_server(self, status, observed_img_idx, count):
+    def mlda_server(self, status, observed_img_idx, count, mode):
         if status == "learn":
             self.data = [np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
                                     "bof" + "/" + status + "/" +
@@ -297,23 +296,37 @@ class MLDA():
                                     "bow" + "/" + status + "/" +
                                     WORD_HIST, dtype=np.int32) * 5]
             rospy.loginfo("Defalut learning mode start\n")
-            self.mlda_learn(status, None, LEARN_RESULT_FOLDER , False)
+            self.mlda_learn(status, None, mode, LEARN_RESULT_FOLDER, False)
 
         else:
-            self.data = [np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
-                                    "bof/{}/{}".format(status, observed_img_idx) + "/" + "histgram_img_{}.txt".format(count),
-                                    dtype=np.int32), None]
-            self.mlda_learn(status, count, ESTIMATE_RESULT_FOLDER + "/" +
-                            "{}".format(observed_img_idx), True)
+            if mode == "0":
+                self.data = [np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
+                                        "bof/{}/{}/{}".format(status, mode,
+                                                              observed_img_idx) + "/" + "histgram_img_{}.txt".format(
+                    count),
+                                        dtype=np.int32), None]
+                self.mlda_learn(status, count, mode, ESTIMATE_RESULT_FOLDER + "/" +
+                                "{}".format(observed_img_idx), True)
+                return
 
+            else:
+                self.data = [np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
+                                        "bof/{}/{}/{}".format(status, mode,
+                                                              observed_img_idx) + "/" + "histgram_img_{}.txt".format(
+                    count),
+                                        dtype=np.int32), None]
+                self.mlda_learn(status, count, mode, ESTIMATE_RESULT_FOLDER + "/" +
+                                "{}".format(observed_img_idx), True)
 
     def __init__(self):
         self.data = []
-        self.mlda_server("learn", None, None)
+        #self.mlda_server("learn", None, None, None)
+
+
 ######################################################################################################
 
 if __name__ == '__main__':
-    #sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
-    #rospy.init_node('em_mlda_learn_server')
+    # sys.stdout = codecs.getwriter('utf_8')(sys.stdout)
+    # rospy.init_node('em_mlda_learn_server')
     MLDA()
     # rospy.spin()
