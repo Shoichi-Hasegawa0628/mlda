@@ -39,7 +39,7 @@ class ExtractImgBof():
             print(type(yolov3_image))
             self.cut_img = self.image_callback(yolov3_image)
             #self.cut_img = yolov3_image
-            print(type(self.cut_img))
+            #print(type(self.cut_img))
             result = self.make_codebook(None, None, status, count, observed_img_idx, mode)
             if result == 0:
                 return 0
@@ -48,7 +48,7 @@ class ExtractImgBof():
     def calc_feature(self, img):
         kp, discriptor = self.detector.detectAndCompute(img, None)
 
-        """
+
         if discriptor is None:
             print("特徴量抽出に失敗しました。\n")
             return 0, 0
@@ -56,7 +56,7 @@ class ExtractImgBof():
         elif len(discriptor) < 50:
             print("指定したcode_book_sizeよりも特徴数が少ないため失敗しました。\n")
             return 0, np.array(discriptor, dtype=np.float32)
-        """
+
 
         return 1, np.array(discriptor, dtype=np.float32)
 
@@ -152,6 +152,7 @@ class ExtractImgBof():
 
         else:
             if mode == "0":
+                hists = []
                 code_book = np.loadtxt(PROCESSING_DATA_FOLDER + "/" +
                                         "bof/{}/{}/{}".format(status, mode, observed_img_idx) + "/" +
                                         "codebook_{}.txt".format(count),
@@ -165,7 +166,7 @@ class ExtractImgBof():
                 for i in idx:
                     h[int(i)] += 1
 
-                self.hists.append(h)
+                hists.append(h)
                 if os.path.exists(PROCESSING_DATA_FOLDER + "/" +
                                   "bof/{}/{}/{}".format(status, mode, observed_img_idx)
                                   ) is True:
@@ -182,7 +183,7 @@ class ExtractImgBof():
                 np.savetxt(PROCESSING_DATA_FOLDER + "/" +
                            "bof/{}/{}/{}".format(status, mode, observed_img_idx) + "/" +
                            "histgram_img_{}.txt".format(count),
-                           self.hists,
+                           hists,
                            fmt=str("%d"))
 
             else:

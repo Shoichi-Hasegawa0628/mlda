@@ -55,9 +55,9 @@ class MLDA():
             with open(os.path.join(save_dir, "model_{}.pickle".format(count)), "wb") as f:
                 pickle.dump([n_dz, n_mzw, n_mz, docs_mdn, topics_mdn], f)
 
-    def save_frequency_z(self, topics_mdn, Modality_num, Object_num):
+    def save_frequency_z(self, topics_mdn, Modality_num, Object_num, count):
         # 単語ごとに割り当てられた物体カテゴリを保存 (物体の画像と単語に割り当てられた物体カテゴリを一緒に保存)
-        np.savetxt(str(roslib.packages.get_pkg_dir("spco2_mlda")) + "/data/pre_learning/co_frequency/co_word.csv", topics_mdn, delimiter=",", fmt="%s")
+        #np.savetxt(str(roslib.packages.get_pkg_dir("spco2_mlda")) + "/data/pre_learning/co_frequency/co_word.csv", topics_mdn, delimiter=",", fmt="%s")
 
         # 物体ごとの物体カテゴリの割当回数を保存
         temporary_topic = [[0 for s in range(CATEGORYNUM)] for d in range(Object_num)]
@@ -87,7 +87,7 @@ class MLDA():
                         frequency_topic[d][s] += temporary_topic[d][s]
                         # print("保存されるデータ:", frequency_topic[d][s])
 
-                f = open(str(roslib.packages.get_pkg_dir("spco2_mlda")) + "/data/pre_learning/co_frequency/co_frequency.csv", 'w')
+                f = open(str(roslib.packages.get_pkg_dir("spco2_mlda")) + "/data/pre_learning/co_frequency/co_frequency_{}.csv".format(count), 'w')
                 writer = csv.writer(f)
                 writer.writerows(frequency_topic)
 
@@ -260,7 +260,7 @@ class MLDA():
                         if mode == "0":
                             if Target_modality == 0 and Target_character == Target_character_num - 1:
                                 print("Save!")
-                                self.save_frequency_z(topics_mdn, Modality_num, Object_num)
+                                self.save_frequency_z(topics_mdn, Modality_num, Object_num, count)
                             # print("object_length: ", len(topics_mdn)
 
                         n_dz[Target_object][Target_character_category] += 1
@@ -320,7 +320,7 @@ class MLDA():
 
     def __init__(self):
         self.data = []
-        #self.mlda_server("learn", None, None, None)
+        #self.mlda_server("learn", None, None, None) # 動作確認用
 
 
 ######################################################################################################
